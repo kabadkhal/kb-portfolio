@@ -11,6 +11,8 @@ import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Chaos from './components/Chaos';
 import Contact from './components/Contact';
+import HeroGreeting from './components/HeroGreeting';
+import MobileRail from './components/MobileRail';
 
 export default function Home() {
   return (
@@ -20,6 +22,7 @@ export default function Home() {
       <TechOrb />
       <Nav />
       <ScrollRail />
+      <MobileRail />
       <StatusBar />
       <Terminal />
       <ScrambleAll />
@@ -30,9 +33,7 @@ export default function Home() {
               <span key={i} style={{ animationDelay: `${i * 0.08}s` }}>{c}</span>
             ))}
           </h1>
-          <p className="sub">
-            <b>Cloud and DevOps</b> engineer building full-stack products that ship and scale.
-          </p>
+             <HeroGreeting />
         </section>
         <About />
         <Skills />
