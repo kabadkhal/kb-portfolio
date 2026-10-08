@@ -3,7 +3,7 @@
 Personal portfolio of **Kartik Badkhal**, a full-stack software developer and DevOps engineer. It is an interactive, single-page site built with Next.js and Three.js, with a terminal-style boot sequence, a glass 3D tech orb and a live "break it" Kubernetes-style demo.
 
 **Live site:** [https://YOUR-SITE.vercel.app](https://kb-portfolio-puce.vercel.app/)
-**Repository:** https://github.com/YOUR-USERNAME/kb-portfolio
+**Repository:** https://github.com/kabadkhal/kb-portfolio.git
 
 <!-- Add a screenshot or GIF here: ![Preview](./public/preview.png) -->
 
