@@ -13,6 +13,7 @@ import Chaos from './components/Chaos';
 import Contact from './components/Contact';
 import HeroGreeting from './components/HeroGreeting';
 import MobileRail from './components/MobileRail';
+import Certifications from './components/Certifications';
 
 export default function Home() {
   return (
@@ -39,6 +40,7 @@ export default function Home() {
         <Skills />
         <Projects />
         <Chaos />
+        <Certifications />
         <Contact />
       </main>
     </>
