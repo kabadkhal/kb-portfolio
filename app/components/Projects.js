@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
-// EDIT LATER: replace gh with each project's exact repo, and live with the live link
-const GH = 'https://github.com/kabadkhal';
+// gh = GitHub repo, live = deployed link. Use '#' if there is no live link yet (the button is then hidden).
 const P = [
   {
     s: 'JobTrack',
@@ -10,7 +9,7 @@ const P = [
     cat: 'FULL-STACK / NEXT.JS',
     d: 'Built and deployed a full-stack job application tracking platform using Next.js, React, TypeScript and MongoDB. Implemented authentication, job application tracking, status pipelines, dashboard statistics and a responsive interface for managing the job-search workflow.',
     tags: ['Next.js', 'React', 'TypeScript', 'MongoDB', 'Authentication', 'Vercel'],
-    gh: GH, live: '#',
+    gh: 'https://github.com/kabadkhal/JobTrack', live: '#',
   },
   {
     s: 'InfraFlow',
@@ -18,7 +17,7 @@ const P = [
     cat: 'DEVOPS / CI-CD',
     d: 'Built a production-oriented DevOps implementation using Docker, Docker Compose, Traefik, PostgreSQL, LocalStack S3, GitHub Actions and Docker Hub. Implemented containerization, reverse-proxy routing, health checks, automated Docker image builds, SHA-based deployments, production deployment and rollback to a previous known-good version.',
     tags: ['Docker', 'Docker Compose', 'Traefik', 'GitHub Actions', 'PostgreSQL', 'LocalStack S3', 'Docker Hub', 'CI/CD'],
-    gh: GH, live: '#',
+    gh: 'https://github.com/kabadkhal/Infraflow', live: '#',
   },
   {
     s: 'Food Delivery',
@@ -26,7 +25,7 @@ const P = [
     cat: 'KUBERNETES / CI-CD',
     d: 'Architected and deployed a Docker-Kubernetes food delivery platform with independently scalable microservices, service discovery, load balancing and health checks. Built a Jenkins CI/CD pipeline on AWS EC2 with automated build, testing, deployment, auto-recovery and rollback.',
     tags: ['Docker', 'Kubernetes', 'Jenkins', 'AWS EC2', 'Microservices', 'CI/CD'],
-    gh: GH, live: '#',
+    gh: 'https://github.com/kabadkhal/Zomato', live: '#',
   },
   {
     s: 'Ticket Booking',
@@ -34,7 +33,7 @@ const P = [
     cat: 'AWS / TERRAFORM / ANSIBLE',
     d: 'Designed and implemented an end-to-end deployment for a ticket booking application. Terraform provisions the AWS infrastructure as code, Ansible configures the servers and deploys the application, and a Jenkins CI/CD pipeline builds Docker images and releases them to Kubernetes. The project demonstrates infrastructure as code, configuration management, containerization and DevOps automation.',
     tags: ['AWS', 'Terraform', 'Ansible', 'Jenkins', 'Docker', 'Kubernetes', 'CI/CD'],
-    gh: GH, live: '#',
+    gh: 'https://github.com/kabadkhal/Book-My-Show', live: '#',
   },
   {
     s: 'AWS 3-Tier',
@@ -42,7 +41,7 @@ const P = [
     cat: 'AWS / CLOUD',
     d: 'Deployed a scalable 3-tier web application using AWS EC2, RDS and VPC networking across presentation, logic and data layers. Configured subnet segmentation, security groups, NAT gateways and load balancers for secure and resilient inter-tier connectivity.',
     tags: ['AWS EC2', 'RDS', 'VPC', 'Load Balancer', 'NAT Gateway', 'Security Groups'],
-    gh: GH, live: '#',
+    gh: 'https://github.com/kabadkhal/3TierArchitectureApp', live: '#',
   },
 ];
 const N = P.length;
@@ -258,7 +257,7 @@ export default function Projects() {
     <>
       <header className="pj-intro">
         <h2>projects.</h2>
-        <p>Cloud and DevOps projects focused on containerization, Kubernetes orchestration, CI/CD automation, AWS infrastructure and scalable application deployment.</p>
+        <p>Full-stack and DevOps projects, from a Next.js job tracker to Kubernetes orchestration, CI/CD automation, AWS infrastructure and scalable deployments.</p>
       </header>
 
       <section className="pin" ref={pin} id="projects" aria-label="Projects">
@@ -276,14 +275,14 @@ export default function Projects() {
 
           <div className="pj-stage">
             <div className="pj-art"><canvas ref={cv} /></div>
-                        <div className="pj-tx" key={cur} aria-live="polite">
+            <div className="pj-tx" key={cur} aria-live="polite">
               <div className="pj-top"><span>0{cur + 1}</span><span>{p.cat}</span></div>
               <h3>{p.name}</h3>
               <p className="pj-d">{p.d}</p>
               <div className="pj-tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</div>
               <div className="pj-lk">
-                <a href={p.gh}>GitHub</a>
-                <a href={p.live}>View Project ↗</a>
+                <a href={p.gh} target="_blank" rel="noopener noreferrer">GitHub</a>
+                {p.live !== '#' && <a href={p.live} target="_blank" rel="noopener noreferrer">View Project ↗</a>}
               </div>
             </div>
           </div>
