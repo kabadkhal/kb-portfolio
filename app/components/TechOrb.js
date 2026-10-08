@@ -2,14 +2,16 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-// [label, badge color, text color] - edit to match your real stack
+// [label, color (6-digit hex)] - EDIT THIS LIST. Remove tools you have not used.
 const T = [
-  ['Docker', '#2496ed', '#fff'], ['K8s', '#326ce5', '#fff'], ['Jenkins', '#d33833', '#fff'],
-  ['AWS', '#ff9900', '#000'], ['Git', '#f05033', '#fff'], ['Actions', '#2088ff', '#fff'],
-  ['Next', '#ffffff', '#000'], ['React', '#20232a', '#61dafb'], ['TS', '#3178c6', '#fff'],
-  ['Node', '#3c873a', '#fff'], ['Mongo', '#4db33d', '#fff'], ['Postgres', '#336791', '#fff'],
-  ['Traefik', '#24a1c1', '#fff'], ['EC2', '#ff9900', '#000'], ['RDS', '#527fff', '#fff'],
-  ['VPC', '#8c4fff', '#fff'], ['CI/CD', '#4df0a0', '#000'], ['Linux', '#fcc624', '#000'],
+  ['Docker', '#2496ed'], ['K8s', '#326ce5'], ['Helm', '#4f6bed'], ['Terraform', '#7b42bc'],
+  ['Ansible', '#ff4d4d'], ['Jenkins', '#ff5a52'], ['Actions', '#2088ff'], ['Git', '#f05033'],
+  ['AWS', '#ff9900'], ['EC2', '#ffb340'], ['S3', '#e25444'], ['RDS', '#527fff'],
+  ['VPC', '#8c4fff'], ['IAM', '#dd344c'], ['Linux', '#fcc624'], ['Bash', '#6ccf3a'],
+  ['Python', '#4b8bbe'], ['Nginx', '#12c35a'], ['Traefik', '#24a1c1'], ['Prometheus', '#e6522c'],
+  ['Grafana', '#f46800'], ['Redis', '#dc382d'], ['Postgres', '#4f8fc7'], ['Mongo', '#47a248'],
+  ['Next', '#e5e7eb'], ['React', '#61dafb'], ['TS', '#3178c6'], ['Node', '#5fa04e'],
+  ['Compose', '#38b6ff'], ['CI/CD', '#4df0a0'],
 ];
 
 // where the orb sits for each section: x position, size, opacity, glow color
@@ -21,6 +23,73 @@ const STATES = {
 };
 const SEL = { hero: '#hero', about: '#about', skills: '#skills', work: '.pj-intro' };
 
+// draws one frosted-glass badge
+function makeBadge(label, col) {
+  const S = 256, cx = S / 2, r = 108;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const x = c.getContext('2d');
+
+  // soft colored halo
+  let g = x.createRadialGradient(cx, cx, r * 0.6, cx, cx, r * 1.16);
+  g.addColorStop(0, col + '66');
+  g.addColorStop(1, col + '00');
+  x.fillStyle = g;
+  x.beginPath(); x.arc(cx, cx, r * 1.16, 0, 7); x.fill();
+
+  // glass body
+  g = x.createRadialGradient(cx * 0.8, cx * 0.7, r * 0.08, cx, cx, r);
+  g.addColorStop(0, 'rgba(255,255,255,0.34)');
+  g.addColorStop(0.5, col + '30');
+  g.addColorStop(1, col + '70');
+  x.fillStyle = g;
+  x.beginPath(); x.arc(cx, cx, r, 0, 7); x.fill();
+
+  // bright rim, white at top-left fading to the tool color
+  g = x.createLinearGradient(cx - r, cx - r, cx + r, cx + r);
+  g.addColorStop(0, 'rgba(255,255,255,0.95)');
+  g.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+  g.addColorStop(1, col + 'cc');
+  x.strokeStyle = g; x.lineWidth = 5;
+  x.beginPath(); x.arc(cx, cx, r - 2, 0, 7); x.stroke();
+
+  // inner thin ring for depth
+  x.strokeStyle = 'rgba(255,255,255,0.14)'; x.lineWidth = 2;
+  x.beginPath(); x.arc(cx, cx, r - 14, 0, 7); x.stroke();
+
+  // specular highlight (top-left)
+  x.save();
+  x.translate(cx - 36, cx - 54);
+  x.rotate(-0.62);
+  g = x.createLinearGradient(0, -22, 0, 22);
+  g.addColorStop(0, 'rgba(255,255,255,0.65)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g;
+  x.beginPath(); x.ellipse(0, 0, 52, 20, 0, 0, 7); x.fill();
+  x.restore();
+
+  // soft reflection (bottom)
+  g = x.createRadialGradient(cx, cx + r * 0.78, 2, cx, cx + r * 0.78, r * 0.55);
+  g.addColorStop(0, col + '88');
+  g.addColorStop(1, col + '00');
+  x.save();
+  x.beginPath(); x.arc(cx, cx, r - 8, 0, 7); x.clip();
+  x.fillStyle = g; x.fillRect(0, 0, S, S);
+  x.restore();
+
+  // label
+  const size = label.length > 8 ? 34 : label.length > 5 ? 42 : label.length > 3 ? 54 : 66;
+  x.font = `800 ${size}px sans-serif`;
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.shadowColor = col; x.shadowBlur = 16;
+  x.fillStyle = '#ffffff';
+  x.fillText(label, cx, cx + 4);
+
+  const tx = new THREE.CanvasTexture(c);
+  tx.colorSpace = THREE.SRGBColorSpace;
+  return tx;
+}
+
 export default function TechOrb() {
   const cvRef = useRef(null);
   const glowRef = useRef(null);
@@ -31,31 +100,41 @@ export default function TechOrb() {
     R.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     const sc = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    cam.position.z = 8;
+    cam.position.z = 8.4;
 
-    const textures = T.map(([t, bg, fg]) => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const x = c.getContext('2d');
-      x.fillStyle = bg; x.beginPath(); x.arc(64, 64, 60, 0, 7); x.fill();
-      x.fillStyle = fg; x.font = '800 ' + (t.length > 5 ? 26 : t.length > 3 ? 32 : 40) + 'px sans-serif';
-      x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, 64, 66);
-      return new THREE.CanvasTexture(c);
-    });
+    const textures = T.map(([t, col]) => makeBadge(t, col));
 
     const orb = new THREE.Group();
     const sprites = [];
-    const N = 48;
+    const N = 66;
+    const RAD = 2.55;
     for (let i = 0; i < N; i++) {
       const y = 1 - (2 * (i + 0.5)) / N, r = Math.sqrt(1 - y * y), a = i * 2.39996;
-      const mat = new THREE.SpriteMaterial({ map: textures[i % textures.length], transparent: true });
+      const mat = new THREE.SpriteMaterial({
+        map: textures[i % textures.length],
+        transparent: true,
+        depthWrite: false,
+      });
       const s = new THREE.Sprite(mat);
-      s.position.set(Math.cos(a) * r, y, Math.sin(a) * r).multiplyScalar(2.3);
-      s.scale.setScalar(0.55 + Math.random() * 0.35);
+      s.position.set(Math.cos(a) * r, y, Math.sin(a) * r).multiplyScalar(RAD);
+      s.scale.setScalar(0.62 + Math.random() * 0.3);
       s.userData.b = s.position.clone();
       s.userData.p = Math.random() * 6;
-      sprites.push(s); orb.add(s);
+      sprites.push(s);
+      orb.add(s);
     }
+
+    // two thin glass rings around the orb
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x4df0a0, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false,
+    });
+    const ringGeo = new THREE.RingGeometry(RAD + 0.25, RAD + 0.27, 160);
+    const ring1 = new THREE.Mesh(ringGeo, ringMat);
+    ring1.rotation.x = Math.PI / 2.25;
+    const ring2 = new THREE.Mesh(ringGeo, ringMat);
+    ring2.rotation.x = Math.PI / 2;
+    ring2.rotation.y = 0.7;
+    orb.add(ring1, ring2);
     sc.add(orb);
 
     const resize = () => {
@@ -73,6 +152,7 @@ export default function TechOrb() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let cur = 'hero', ox = 0, os = 1, oo = 1, rot = 0, raf;
     const t0 = performance.now();
+    const wp = new THREE.Vector3();
 
     const loop = () => {
       const t = (performance.now() - t0) / 1000;
@@ -97,10 +177,15 @@ export default function TechOrb() {
       rot += ((mx / window.innerWidth - 0.5) * 3 - rot) * 0.04;
       orb.rotation.y = reduce ? 0 : t * 0.15 + rot;
       orb.rotation.x = reduce ? 0 : (my / window.innerHeight - 0.5) * 0.6;
+      ringMat.opacity = 0.18 * oo;
+
       sprites.forEach((s) => {
-        s.material.opacity = oo;
-        const k = 1 + 0.06 * Math.sin(t * 1.5 + s.userData.p);
+        const k = 1 + 0.05 * Math.sin(t * 1.5 + s.userData.p);
         s.position.copy(s.userData.b).multiplyScalar(k);
+        // badges at the back fade, so the front ones feel like glass in front
+        s.getWorldPosition(wp);
+        const depth = THREE.MathUtils.clamp((wp.z / (RAD * os)) * 0.5 + 0.5, 0, 1);
+        s.material.opacity = oo * (0.4 + 0.6 * depth);
       });
       R.render(sc, cam);
 
@@ -119,6 +204,8 @@ export default function TechOrb() {
       window.removeEventListener('resize', resize);
       textures.forEach((tx) => tx.dispose());
       sprites.forEach((s) => s.material.dispose());
+      ringGeo.dispose();
+      ringMat.dispose();
       R.dispose();
     };
   }, []);
