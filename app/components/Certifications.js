@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 // ---------- EDIT HERE ----------
-// Files live in public/certs/  (NAME.jpg = full size, NAME-thumb.jpg = preview, NAME.pdf = download)
+// Files live in public/certs/  (NAME.jpg = full size, NAME-thumb.jpg = preview)
 const ITEMS = [
   { id: 'internship', badge: 'Intern', title: 'DevOps Internship', org: 'High Catch Private Limited, with StarAgile', date: '8 Apr to 31 Oct 2025' },
   { id: 'kubernetes', badge: 'K8s', title: 'Scalable Web Applications on Kubernetes', org: 'StarAgile', date: '31 Oct 2025' },
@@ -14,7 +14,6 @@ const ITEMS = [
 
 const full = (it) => `/certs/${it.id}.jpg`;
 const thumb = (it) => `/certs/${it.id}-thumb.jpg`;
-const pdf = (it) => `/certs/${it.id}.pdf`;
 
 const CSS = `
 .cf{position:relative;z-index:2;padding:32px clamp(20px,5.3vw,140px) 110px;margin:-12vh 0 0;color:var(--ink,#eaf6f0)}
@@ -181,7 +180,6 @@ export default function Certifications() {
           <div className="cf-dates"><b>8 Apr 2025</b><b>31 Oct 2025</b></div>
           <div className="cf-actions">
             <button type="button" className="cf-link" onClick={(e) => show(0, e)}>View certificate</button>
-            <a className="cf-link" href={pdf(intern)} download>Download PDF</a>
           </div>
         </div>
         <button type="button" className="cf-thumb" onClick={(e) => show(0, e)} aria-label={`View ${intern.title} certificate`}>
@@ -206,8 +204,7 @@ export default function Certifications() {
               </div>
               <h3 className="cf-title">{c.title}</h3>
               <div className="cf-meta">
-                {c.org}<br />{c.date}<br />
-                <a className="cf-link" href={pdf(c)} download>Download PDF</a>
+                {c.org}<br />{c.date}
               </div>
             </div>
           </li>
@@ -224,7 +221,6 @@ export default function Certifications() {
           <div className="cf-lb-cap" onClick={(e) => e.stopPropagation()}>
             <b>{cur.title}</b>
             <span>{cur.org} · {cur.date}</span>
-            <a href={pdf(cur)} download>Download PDF</a>
           </div>
         </div>
       )}
