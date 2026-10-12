@@ -845,3 +845,393 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 }
 .cursor.big.press { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
 @media (pointer: coarse) { .cursor { display: none; } }
+
+/* ---------- Theme: dark / light ---------- */
+body { transition: background .4s, color .4s; }
+
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* these always stay dark, like a real terminal */
+.boot, .term { --bg: #040a0b; --ink: #eaf6f0; --mute: #86a094; --g: #4df0a0; }
+
+html[data-theme='light'] {
+  --bg: #f4f8f5;
+  --ink: #0b1713;
+  --mute: #566b60;
+  --g: #0a8f56;
+}
+
+.theme-btn {
+  position: fixed;
+  left: clamp(12px, 2vw, 24px);
+  bottom: 50px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  display: grid; place-items: center;
+  z-index: 9;
+  transition: transform .3s, border-color .3s;
+}
+.theme-btn:hover { transform: rotate(25deg) scale(1.08); border-color: var(--g); }
+.theme-btn:focus-visible { outline: 2px solid var(--g); outline-offset: 3px; }
+.theme-btn svg { width: 20px; height: 20px; }
+
+/* ----- light theme overrides ----- */
+html[data-theme='light'] .sbar { background: rgba(244,248,245,.88); border-top-color: rgba(0,0,0,.1); }
+html[data-theme='light'] .sbar button { border-color: rgba(0,0,0,.25); }
+
+html[data-theme='light'] .pr-track { background: rgba(0,0,0,.14); }
+html[data-theme='light'] .pr-n { border-color: rgba(0,0,0,.3); }
+html[data-theme='light'] .pr-toast { background: rgba(244,248,245,.96); }
+
+html[data-theme='light'] .pj-intro h2 { background: linear-gradient(120deg, #0b3d28, var(--g) 55%, #7fd8aa); -webkit-background-clip: text; background-clip: text; }
+html[data-theme='light'] .pj-list::before { background: rgba(0,0,0,.12); }
+html[data-theme='light'] .pj-list button { color: rgba(0,0,0,.38); }
+html[data-theme='light'] .pj-list button:hover { color: rgba(0,0,0,.7); }
+html[data-theme='light'] .pj-list button[aria-current='true'] { color: var(--ink); }
+html[data-theme='light'] .pj-stage { border-color: rgba(0,0,0,.1); background: linear-gradient(160deg, rgba(255,255,255,.8), rgba(255,255,255,.4)); }
+html[data-theme='light'] .pj-d { color: #3f554a; }
+html[data-theme='light'] .pj-tags span { border-color: rgba(0,0,0,.18); }
+/* project animations: flip the white-on-dark drawing to dark-on-light */
+
+
+html[data-theme='light'] .ch-cluster, html[data-theme='light'] .ch-side { border-color: rgba(0,0,0,.1); background: linear-gradient(160deg, rgba(255,255,255,.8), rgba(255,255,255,.4)); }
+html[data-theme='light'] .ch-stats div { background: rgba(0,0,0,.04); }
+html[data-theme='light'] .ch-pod b { color: var(--ink); }
+html[data-theme='light'] .ch-btns button { border-color: rgba(0,0,0,.28); }
+html[data-theme='light'] .ch-log .ok { color: #4df0a0; }
+
+/* contact card gets a mint tint so it still stands out on a light page */
+html[data-theme='light'] .contact { background: #d2efdf; }
+
+/* ---------- Light theme v2: less white, more color ---------- */
+html[data-theme='light'] {
+  --bg: #cfe5d9;
+  --ink: #0b1713;
+  --mute: #3f5a4d;
+  --g: #087a49;
+}
+/* ---------- Light theme FINAL: calm sage, deep-green accents ---------- */
+html[data-theme='light'] {
+  --bg: #e4ece5;
+  --ink: #0b1713;
+  --mute: #4a6355;
+  --g: #0a7a4b;
+}
+
+html[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.75) 0, transparent 42%),
+    radial-gradient(circle at 100% 100%, #cddfd3 0, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* the bright turquoise patch that follows the cursor */
+html[data-theme='light'] .glow { opacity: .15 !important; }
+
+/* project animations draw their own light colors, so no filter at all */
+html[data-theme='light'] .pj-art canvas { filter: none !important; }
+
+html[data-theme='light'] .pj-stage,
+html[data-theme='light'] .ch-cluster,
+html[data-theme='light'] .ch-side {
+  background: linear-gradient(160deg, rgba(255,255,255,.62), rgba(255,255,255,.3));
+  border-color: rgba(10,60,40,.14);
+  box-shadow: 0 20px 50px -30px rgba(10,60,40,.35);
+}
+html[data-theme='light'] .pj-intro h2 {
+  background: linear-gradient(120deg, #0b3d28, #0a7a4b 55%, #5cc596);
+  -webkit-background-clip: text; background-clip: text;
+}
+html[data-theme='light'] .pj-list button { color: rgba(11,23,19,.42); }
+html[data-theme='light'] .pj-list button:hover { color: rgba(11,23,19,.75); }
+html[data-theme='light'] .pj-list button[aria-current='true'] { color: #0b1713; }
+html[data-theme='light'] .ch-stats div { background: rgba(10,60,40,.06); }
+
+html[data-theme='light'] .sbar { background: rgba(214,228,218,.92); border-top-color: rgba(10,60,40,.16); }
+html[data-theme='light'] .theme-btn { background: rgba(232,241,235,.9); border-color: rgba(10,60,40,.28); }
+
+/* scroll rail: darker amber so it is readable on light */
+html[data-theme='light'] .pr.rb { --pc: #b45309; }
+html[data-theme='light'] .pr-n span { color: #3b5248; }
+html[data-theme='light'] .pr-n.on span { color: var(--pc); }
+html[data-theme='light'] .pr-n.on b { color: #f4f8f5; }
+
+html[data-theme='light'] .contact { background: #c2dccb; }
+html[data-theme='light'] .ct-pill i { background: #0a7a4b; }
+
+/* ================= Light theme: Paper & Indigo ================= */
+/* To change the whole look, only edit the variables in this first block. */
+:root {
+  --bad: #ff5d6c;
+  --cv-sub: #a9c0b5;
+  --cv-line: #ffffff2a;
+  --cv-box: #ffffff30;
+  --cv-fill: #ffffff08;
+}
+
+html[data-theme='light'] {
+  --bg: #f6f1e7;      /* warm paper */
+  --ink: #1b1530;     /* deep ink */
+  --mute: #5f5877;    /* secondary text */
+  --g: #4338ca;       /* main accent: indigo */
+  --warm: #ff8a4c;    /* second accent: peach-orange */
+  --soft: #e4ddfb;    /* soft tint for the contact section */
+  --bad: #d9381e;     /* error / failed pod */
+  --cv-sub: #3d3659;
+  --cv-line: #1b153033;
+  --cv-box: #1b153044;
+  --cv-fill: #ffffffaa;
+}
+
+html[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 6% 0%, color-mix(in srgb, var(--warm) 22%, #fff) 0, transparent 42%),
+    radial-gradient(circle at 100% 100%, var(--soft) 0, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+html[data-theme='light'] .glow {
+  background: radial-gradient(circle, var(--warm) 0, transparent 60%) !important;
+  opacity: .22 !important;
+}
+
+/* status bar + theme button */
+html[data-theme='light'] .sbar {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  border-top-color: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+html[data-theme='light'] .sbar button { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+html[data-theme='light'] .theme-btn {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+/* scroll rail */
+html[data-theme='light'] .pr.rb { --pc: #c2410c; }
+html[data-theme='light'] .pr-n { background: var(--bg); border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+html[data-theme='light'] .pr-n span { color: var(--mute); }
+html[data-theme='light'] .pr-n.on span { color: var(--pc); }
+html[data-theme='light'] .pr-n.on b { color: var(--bg); }
+html[data-theme='light'] .pr-track { background: color-mix(in srgb, var(--ink) 16%, transparent); }
+html[data-theme='light'] .pr-toast { background: var(--bg); }
+html[data-theme='light'] .pr.lt .pr-n { background: var(--soft); }
+html[data-theme='light'] .pr.lt .pr-fill,
+html[data-theme='light'] .pr.lt .pr-th,
+html[data-theme='light'] .pr.lt .pr-n.on { background: var(--pc); border-color: var(--pc); }
+html[data-theme='light'] .pr.lt .pr-n.on span { color: var(--ink); }
+html[data-theme='light'] .pr.lt .pr-toast { background: var(--soft); border-color: var(--pc); color: var(--pc); }
+html[data-theme='light'] .pr.lt .pr-pct { color: var(--mute); }
+
+/* projects */
+html[data-theme='light'] .pj-sticky {
+  background: radial-gradient(circle 45vmax at 70% 40%, color-mix(in srgb, var(--g) 10%, transparent), transparent 70%);
+}
+html[data-theme='light'] .pj-intro h2 {
+  background: linear-gradient(120deg, var(--ink), var(--g) 55%, var(--warm));
+  -webkit-background-clip: text; background-clip: text;
+}
+html[data-theme='light'] .pj-list::before { background: color-mix(in srgb, var(--ink) 14%, transparent); }
+html[data-theme='light'] .pj-list button { color: color-mix(in srgb, var(--ink) 40%, transparent); }
+html[data-theme='light'] .pj-list button:hover { color: color-mix(in srgb, var(--ink) 75%, transparent); }
+html[data-theme='light'] .pj-list button[aria-current='true'] { color: var(--ink); }
+html[data-theme='light'] .pj-stage,
+html[data-theme='light'] .ch-cluster,
+html[data-theme='light'] .ch-side {
+  background: linear-gradient(160deg, rgba(255,255,255,.7), rgba(255,255,255,.35));
+  border-color: color-mix(in srgb, var(--ink) 14%, transparent);
+  box-shadow: 0 24px 50px -30px color-mix(in srgb, var(--ink) 45%, transparent);
+}
+html[data-theme='light'] .pj-d { color: #4a4466; }
+html[data-theme='light'] .pj-tags span { border-color: color-mix(in srgb, var(--ink) 22%, transparent); }
+html[data-theme='light'] .pj-art canvas { filter: none !important; }
+
+/* break it. */
+html[data-theme='light'] .ch-lb { border-color: var(--g); color: var(--g); background: color-mix(in srgb, var(--g) 8%, transparent); }
+html[data-theme='light'] .ch-lb.hot { border-color: #c2410c; color: #c2410c; background: rgba(194,65,12,.08); }
+html[data-theme='light'] .ch-pod { border-color: var(--g); background: color-mix(in srgb, var(--g) 7%, transparent); }
+html[data-theme='light'] .ch-pod b { color: var(--ink); }
+html[data-theme='light'] .ch-pod small { color: var(--g); }
+html[data-theme='light'] .ch-fl { background: var(--g); }
+html[data-theme='light'] .ch-pod.down,
+html[data-theme='light'] .ch-pod.bad { border-color: var(--bad); background: rgba(217,56,30,.09); }
+html[data-theme='light'] .ch-pod.down small,
+html[data-theme='light'] .ch-pod.bad small { color: var(--bad); }
+html[data-theme='light'] .ch-pod.start { border-color: #c2410c; background: rgba(194,65,12,.09); }
+html[data-theme='light'] .ch-pod.start small { color: #c2410c; }
+html[data-theme='light'] .ch-btns button { border-color: color-mix(in srgb, var(--ink) 30%, transparent); color: var(--ink); }
+html[data-theme='light'] .ch-btns button:hover { background: var(--g); border-color: var(--g); color: #fff; }
+html[data-theme='light'] .ch-stats div { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+html[data-theme='light'] .ch-stats b { color: var(--g); }
+html[data-theme='light'] .ch-stats b.bad { color: var(--bad); }
+html[data-theme='light'] .ch-log { background: #1b1530; }
+
+/* contact */
+html[data-theme='light'] .contact { background: var(--soft); color: var(--ink); }
+html[data-theme='light'] .ct-pill { border-color: var(--ink); }
+html[data-theme='light'] .ct-pill i { background: var(--g); }
+html[data-theme='light'] .cl { color: color-mix(in srgb, var(--g) calc(var(--k, 0) * 100%), var(--ink)); }
+html[data-theme='light'] .ct-acc .cl { color: color-mix(in srgb, var(--ink) calc(var(--k, 0) * 100%), var(--g)); }
+html[data-theme='light'] .ct-copy { background: var(--ink); color: #ffd9b8; }
+html[data-theme='light'] .resume { border-color: var(--ink); color: var(--ink); }
+html[data-theme='light'] .resume:hover { background: var(--ink); color: var(--soft); }
+html[data-theme='light'] .socials a { color: var(--ink); border-bottom-color: var(--ink); }
+html[data-theme='light'] .socials a:hover { color: var(--g); border-bottom-color: var(--g); }
+html[data-theme='light'] .foot { color: var(--mute); }
+html[data-theme='light'] .ct-r { background: var(--ink); color: #ffd9b8; }
+html[data-theme='light'] .ct-r.b { background: var(--warm); color: var(--ink); }
+html[data-theme='light'] .ct-run { background: var(--warm); color: var(--ink); }
+
+/* ============ Light theme: Sky & Coral, frosted glass ============ */
+/* Colors for the animations MUST stay in 6-digit hex like #2563eb */
+html[data-theme='light'] {
+  --bg: #e9f1ff;
+  --ink: #0f1b3a;
+  --mute: #52608a;
+  --g: #2563eb;       /* main accent: electric blue */
+  --warm: #ff6b81;    /* second accent: coral */
+  --soft: #dcd3ff;    /* lilac, used by the contact section */
+  --bad: #e11d48;
+
+  --m1: #8fd0ff;      /* background glow colors */
+  --m2: #c8b4ff;
+  --m3: #ffb3c4;
+  --m4: #a8f0e2;
+
+  --cv-sub: #243256;
+  --cv-line: #0f1b3a33;
+  --cv-box: #0f1b3a4d;
+  --cv-fill: #ffffff80;   /* translucent white = glass boxes in the animations */
+}
+
+/* colorful backdrop so the glass has something to blur */
+html[data-theme='light'] body {
+  background:
+    radial-gradient(45vmax 45vmax at 6% 4%, var(--m1) 0, transparent 62%),
+    radial-gradient(48vmax 48vmax at 96% 10%, var(--m2) 0, transparent 62%),
+    radial-gradient(45vmax 45vmax at 85% 96%, var(--m3) 0, transparent 62%),
+    radial-gradient(42vmax 42vmax at 4% 92%, var(--m4) 0, transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
+}
+html[data-theme='light'] .glow {
+  background: radial-gradient(circle, var(--warm) 0, transparent 60%) !important;
+  opacity: .3 !important;
+}
+
+/* frosted glass panels */
+html[data-theme='light'] .pj-stage,
+html[data-theme='light'] .ch-cluster,
+html[data-theme='light'] .ch-side {
+  background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,255,255,.2));
+  border: 1px solid rgba(255,255,255,.8);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: 0 28px 60px -28px rgba(30,50,120,.45), inset 0 1px 0 rgba(255,255,255,.95);
+}
+html[data-theme='light'] .pj-art canvas { filter: none !important; }
+
+html[data-theme='light'] .pj-tags span {
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.85);
+  color: var(--ink);
+}
+html[data-theme='light'] .pj-d { color: #34416a; }
+
+html[data-theme='light'] .ch-stats div,
+html[data-theme='light'] .ch-pod {
+  background: rgba(255,255,255,.42);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+html[data-theme='light'] .ch-pod b { color: var(--ink); }
+html[data-theme='light'] .ch-pod.down,
+html[data-theme='light'] .ch-pod.bad { background: rgba(225,29,72,.14); border-color: var(--bad); }
+html[data-theme='light'] .ch-log { background: rgba(15,27,58,.9); }
+
+html[data-theme='light'] .sbar,
+html[data-theme='light'] .theme-btn,
+html[data-theme='light'] .pr-toast {
+  background: rgba(255,255,255,.55);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  border-color: rgba(255,255,255,.85);
+}
+html[data-theme='light'] .sbar { border-top: 1px solid rgba(255,255,255,.85); }
+
+html[data-theme='light'] .pj-intro h2 {
+  background: linear-gradient(120deg, var(--ink), var(--g) 55%, var(--warm));
+  -webkit-background-clip: text; background-clip: text;
+}
+html[data-theme='light'] .pj-sticky {
+  background: radial-gradient(circle 45vmax at 70% 40%, rgba(255,255,255,.35), transparent 70%);
+}
+html[data-theme='light'] .ch-btns button:hover { color: #fff; }
+
+/* ============ Light palette: Lagoon & Amber (keep this LAST in the file) ============ */
+html[data-theme='light'] {
+  --bg: #e8f7f5;
+  --ink: #06282d;
+  --mute: #4b6f73;
+  --g: #0e7490;
+  --warm: #f59e0b;
+  --soft: #c9f0ee;
+  --bad: #c2410c;
+
+  --m1: #9be8e6;
+  --m2: #bfe0ff;
+  --m3: #ffe0a3;
+  --m4: #d6c9ff;
+
+  --cv-sub: #134249;
+  --cv-line: #06282d33;
+  --cv-box: #06282d4d;
+  --cv-fill: #ffffff80;
+}
+
+html[data-theme='light'] .pj-d { color: #1f4a50; }
+
+html[data-theme='light'] .pj-stage,
+html[data-theme='light'] .ch-cluster,
+html[data-theme='light'] .ch-side {
+  box-shadow: 0 28px 60px -28px rgba(10,80,95,.4), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+html[data-theme='light'] .ch-log { background: rgba(6,40,45,.92); }
+
+/* ============ Light mode: richer, deeper orb ============ */
+html[data-theme='light'] #gl {
+  filter:
+    saturate(1.45)
+    contrast(1.12)
+    brightness(.97)
+    drop-shadow(0 22px 26px color-mix(in srgb, var(--ink) 32%, transparent));
+}
+
+/* soft colored halo behind the orb so it doesn't float on a flat background */
+html[data-theme='light'] .skills { position: relative; }
+html[data-theme='light'] .skills::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: min(70vw, 760px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--g) 22%, transparent) 0, transparent 68%);
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* make the heading readable on top of the bubbles */
+html[data-theme='light'] .skills h2 {
+  text-shadow: 0 2px 22px color-mix(in srgb, var(--bg) 85%, transparent);
+}

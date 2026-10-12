@@ -23,6 +23,18 @@ const STATES = {
 };
 const SEL = { hero: '#hero', about: '#about', skills: '#skills', work: '.pj-intro' };
 
+// PHONE settings (screens 800px wide or less).
+// s = size relative to "fits the screen width", o = opacity (lower = text easier to read), y = height
+// EDIT these numbers if the globe is still too big or too strong on your phone.
+const PHONE = {
+  hero:   { s: 1,   o: 0.6,  y: 1.5 },
+  about:  { s: 0.8, o: 0.14, y: 1.5 },
+  skills: { s: 1.4, o: 0.9,  y: 0 },   // Stack section: the globe is the star, so big and clear
+  work:   { s: 0.7, o: 0.07, y: 1.5 },
+};
+const FIT_WIDTH = 0.88;   // the globe is at most this share of the screen width on phones
+const ORB_DIAMETER = 6.3; // globe width in scene units at scale 1 (badges included)
+
 // draws one frosted-glass badge
 function makeBadge(label, col) {
   const S = 256, cx = S / 2, r = 108;
@@ -150,7 +162,7 @@ export default function TechOrb() {
     window.addEventListener('resize', resize);
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let cur = 'hero', ox = 0, os = 1, oo = 1, rot = 0, raf;
+    let cur = 'hero', ox = 0, oy = 0, os = 1, oo = 1, rot = 0, raf;
     const t0 = performance.now();
     const wp = new THREE.Vector3();
 
@@ -168,11 +180,25 @@ export default function TechOrb() {
         cur = best;
         document.documentElement.style.setProperty('--glow', STATES[cur].c);
       }
-      const st = STATES[cur], wide = window.innerWidth > 800;
-      ox += ((wide ? st.x : 0) - ox) * 0.05;
-      os += (st.s * (wide ? 1 : 0.7) - os) * 0.05;
-      oo += (st.o - oo) * 0.05;
-      orb.position.set(ox, wide ? 0 : 1.6, 0);
+      const wide = window.innerWidth > 800;
+      let tx, ty, ts, to;
+      if (wide) {
+        const st = STATES[cur];
+        tx = st.x; ty = 0; ts = st.s; to = st.o;
+      } else {
+        // phone: shrink the globe so it fits the screen width, and fade it so text stays readable
+        const ph = PHONE[cur];
+        const visW = 2 * cam.position.z * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect;
+        const fit = Math.min(1, (visW * FIT_WIDTH) / ORB_DIAMETER);
+        tx = 0; ts = ph.s * fit; to = ph.o;
+        // keep the top of the globe on screen
+        ty = Math.min(ph.y, 3.3 - (ORB_DIAMETER / 2) * ts);
+      }
+      ox += (tx - ox) * 0.05;
+      oy += (ty - oy) * 0.05;
+      os += (ts - os) * 0.05;
+      oo += (to - oo) * 0.05;
+      orb.position.set(ox, oy, 0);
       orb.scale.setScalar(os);
       rot += ((mx / window.innerWidth - 0.5) * 3 - rot) * 0.04;
       orb.rotation.y = reduce ? 0 : t * 0.15 + rot;

@@ -11,30 +11,46 @@ const SECS = [
   ['Contact', '.contact'],
 ];
 
+// true  = the bottom dock and the top line appear only while you scroll,
+//         and fade away shortly after you stop.
+// false = they stay on screen all the time.
+const SHOW_ONLY_WHILE_SCROLLING = true;
+const HIDE_AFTER_MS = 1200; // how long they stay after you stop scrolling
+
 const CSS = `
 .mr { display: none; }
 @media (max-width: 800px) {
   .pr, .rail { display: none !important; }
   .mr { display: block; }
 
+  /* the last section gets extra room, so the dock never covers its bottom lines */
+  .contact { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important; }
+
   /* thin top progress line */
   .mr-top { position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 30; background: rgba(255,255,255,.08); pointer-events: none; }
   .mr-top i { display: block; height: 100%; width: 0; background: var(--g); box-shadow: 0 0 10px var(--g); border-radius: 0 3px 3px 0; }
 
-  /* bottom dock, sits above the status bar */
-  .mr-dock { position: fixed; left: 50%; bottom: 46px; transform: translateX(-50%); z-index: 12;
-    width: min(92vw, 380px); padding: .55rem .9rem .5rem; border-radius: 22px;
-    background: rgba(8,16,15,.6); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    border: 1px solid rgba(255,255,255,.14); box-shadow: 0 12px 36px -12px rgba(0,0,0,.7);
+  /* compact bottom dock, sits just above the status bar */
+  .mr-dock { position: fixed; left: 50%; bottom: calc(42px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 12;
+    width: min(88vw, 340px); padding: .38rem .8rem .3rem; border-radius: 18px;
+    background: rgba(8,16,15,.62); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.14); box-shadow: 0 10px 28px -12px rgba(0,0,0,.7);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s ease;
     user-select: none; -webkit-user-select: none; }
-  .mr-lab { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .15rem;
-    font: 600 .68rem ui-monospace, Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+  /* hidden until you scroll, then they slide in; they leave again after you stop */
+  .mr.auto .mr-dock { transform: translate(-50%, 170%); opacity: 0; pointer-events: none; }
+  .mr.auto.moving .mr-dock { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+  .mr.auto .mr-top { opacity: 0; transition: opacity .3s ease; }
+  .mr.auto.moving .mr-top { opacity: 1; }
+  .mr-lab { display: flex; justify-content: space-between; align-items: baseline;
+    font: 600 .62rem ui-monospace, Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
   .mr-lab b { color: var(--g); font-weight: 700; }
-  .mr-row { position: relative; height: 34px; }
+  .mr-row { position: relative; height: 30px; transition: height .3s cubic-bezier(.2,.8,.2,1); }
+  .mr-nodes { transition: opacity .2s ease; }
   .mr-line { position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; margin-top: -1px; background: rgba(255,255,255,.16); border-radius: 2px; }
   .mr-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0; background: var(--g); border-radius: 2px; box-shadow: 0 0 10px var(--g); }
   .mr-nodes { position: absolute; left: 14px; right: 14px; top: 0; bottom: 0; }
-  .mr-n { all: unset; position: absolute; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; display: grid; place-items: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .mr-n { all: unset; position: absolute; top: 50%; width: 34px; height: 30px; margin: -15px 0 0 -17px; display: grid; place-items: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .mr-n i { width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid rgba(255,255,255,.4);
     transition: transform .3s, background .3s, border-color .3s, box-shadow .3s; }
   .mr-n.past i { border-color: var(--g); background: rgba(77,240,160,.35); }
@@ -51,7 +67,7 @@ const CSS = `
   .mr.lt .mr-n.past i { border-color: #0b8f57; background: rgba(11,143,87,.3); }
   .mr.lt .mr-n.on i { background: #0b8f57; border-color: #0b8f57; box-shadow: 0 0 0 4px rgba(11,143,87,.2); }
 }
-@media (prefers-reduced-motion: reduce) { .mr-n i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .mr-n i, .mr-dock { transition: none; } }
 `;
 
 export default function MobileRail() {
@@ -72,7 +88,7 @@ export default function MobileRail() {
     find();
     const late = setTimeout(find, 1500); // sections may mount a moment later
 
-    let raf;
+    let raf, idle;
     const update = () => {
       raf = 0;
       const list = secs.current;
@@ -94,15 +110,24 @@ export default function MobileRail() {
       setActive((a) => (a === idx ? a : idx));
       if (root.current) root.current.classList.toggle('lt', list[idx].l === 'Contact');
     };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const onScroll = () => {
+      schedule();
+      if (SHOW_ONLY_WHILE_SCROLLING && root.current) {
+        root.current.classList.add('moving');
+        clearTimeout(idle);
+        idle = setTimeout(() => { if (root.current) root.current.classList.remove('moving'); }, HIDE_AFTER_MS);
+      }
+    };
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', schedule);
     return () => {
       clearTimeout(late);
+      clearTimeout(idle);
       cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', schedule);
     };
   }, []);
 
@@ -113,7 +138,7 @@ export default function MobileRail() {
   const n = Math.max(count - 1, 1);
 
   return (
-    <div className="mr" ref={root}>
+    <div className={`mr${SHOW_ONLY_WHILE_SCROLLING ? ' auto' : ''}`} ref={root}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="mr-top" aria-hidden="true"><i ref={top} /></div>
       <nav className="mr-dock" aria-label="Sections">

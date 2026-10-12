@@ -5,15 +5,16 @@ import Nav from './components/Nav';
 import ScrollRail from './components/ScrollRail';
 import StatusBar from './components/StatusBar';
 import Terminal from './components/Terminal';
+import ThemeToggle from './components/ThemeToggle';
 import ScrambleAll from './components/ScrambleAll';
 import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Chaos from './components/Chaos';
-import Contact from './components/Contact';
 import HeroGreeting from './components/HeroGreeting';
 import MobileRail from './components/MobileRail';
 import Certifications from './components/Certifications';
+import Contact from './components/Contact';
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
       <MobileRail />
       <StatusBar />
       <Terminal />
+      <ThemeToggle />
       <ScrambleAll />
       <main>
         <section className="hero" id="hero">
@@ -34,7 +36,7 @@ export default function Home() {
               <span key={i} style={{ animationDelay: `${i * 0.08}s` }}>{c}</span>
             ))}
           </h1>
-             <HeroGreeting />
+          <HeroGreeting />
         </section>
         <About />
         <Skills />

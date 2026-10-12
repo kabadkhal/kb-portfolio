@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 const EMAIL = 'kabadkhal@gmail.com';
 const GH = 'https://github.com/kabadkhal';
 const LI = 'https://www.linkedin.com/in/kabadkhal/';
-const CMDS = ['resume','help', 'whoami', 'about', 'skills', 'projects', 'goto', 'ls', 'github', 'linkedin', 'email', 'deploy', 'clear', 'exit'];
+const CMDS = ['resume','help','theme', 'whoami', 'about', 'skills', 'projects', 'goto', 'ls', 'github', 'linkedin', 'email', 'deploy', 'clear', 'exit'];
 const SECS = { home: 'hero', about: 'about', stack: 'skills', skills: 'skills', projects: 'projects', contact: 'contact' };
 const WELCOME = [
   { k: 'hi', t: "Welcome to Kartik's terminal." },
@@ -83,6 +83,7 @@ export default function Terminal() {
           'email       show my email',
           'resume      download my resume',
           'deploy      watch a pipeline run',
+          'theme       switch dark / light',
           'clear       clear the screen',
           'exit        close (or press `)'
         );
@@ -165,6 +166,10 @@ export default function Terminal() {
          }
       case 'clear':
         setLines([]);
+        break;
+      case 'theme':
+        window.dispatchEvent(new Event('toggle-theme'));
+        ok('theme switched');
         break;
       case 'exit':
       case 'close':

@@ -46,6 +46,11 @@ const P = [
 ];
 const N = P.length;
 
+// How much you scroll per project, in screen heights (vh), while the section is pinned.
+// Smaller number = less scrolling. Total pinned length = 100vh + (this number x 5 projects).
+// EDIT these if it feels too fast or too slow.
+const SCROLL_PER_PROJECT = { phone: 42, desktop: 60 };
+
 export default function Projects() {
   const pin = useRef(null);
   const cv = useRef(null);
@@ -56,6 +61,10 @@ export default function Projects() {
   // scroll position -> which project is active
   useEffect(() => {
     const el = pin.current;
+    const fit = () => {
+      const per = window.innerWidth <= 800 ? SCROLL_PER_PROJECT.phone : SCROLL_PER_PROJECT.desktop;
+      el.style.setProperty('height', `${100 + per * N}vh`, 'important');
+    };
     const onScroll = () => {
       const top = el.getBoundingClientRect().top + window.scrollY;
       const prog = Math.min(0.9999, Math.max(0, (window.scrollY - top) / (el.offsetHeight - window.innerHeight)));
@@ -63,12 +72,14 @@ export default function Projects() {
       el.style.setProperty('--p', i / (N - 1));
       if (i !== curRef.current) { curRef.current = i; setCur(i); }
     };
+    const onResize = () => { fit(); onScroll(); };
+    fit();
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -78,8 +89,24 @@ export default function Projects() {
     const x = C.getContext('2d');
     if (!x.roundRect) x.roundRect = function (a, b, c, d) { this.rect(a, b, c, d); };
     let W = 0, H = 0, fs = 12;
-    const G = '#4df0a0', RD = '#ff5d6c';
+    // colors come from your CSS variables, so the drawing follows the dark / light theme
+    let G = '#4df0a0', RD = '#ff5d6c', INK = '#ffffff', SUB = '#a9c0b5', MUTED = '#86a094',
+      LINE = '#ffffff2a', BOX = '#ffffff30', FILL = '#ffffff08';
+    let lastTheme = '';
     const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+    const readColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (n, d) => cs.getPropertyValue(n).trim() || d;
+      G = v('--g', '#4df0a0');
+      RD = v('--bad', '#ff5d6c');
+      INK = v('--ink', '#ffffff');
+      SUB = v('--cv-sub', '#a9c0b5');
+      MUTED = v('--mute', '#86a094');
+      LINE = v('--cv-line', '#ffffff2a');
+      BOX = v('--cv-box', '#ffffff30');
+      FILL = v('--cv-fill', '#ffffff08');
+    };
 
     const rs = () => {
       const d = Math.min(window.devicePixelRatio || 1, 2);
@@ -91,10 +118,10 @@ export default function Projects() {
     const B = (a, b, w, h, l, on, col) => {
       x.save();
       x.beginPath(); x.roundRect(a, b, w, h, 10);
-      x.fillStyle = on ? (col || G) + '26' : '#ffffff08'; x.fill();
-      x.strokeStyle = on ? (col || G) : '#ffffff30'; x.lineWidth = on ? 2 : 1.2; x.stroke();
+      x.fillStyle = on ? (col || G) + '26' : FILL; x.fill();
+      x.strokeStyle = on ? (col || G) : BOX; x.lineWidth = on ? 2 : 1.2; x.stroke();
       if (l) {
-        x.fillStyle = on ? '#fff' : '#a9c0b5';
+        x.fillStyle = on ? INK : SUB;
         x.font = `500 ${fs}px Bricolage Grotesque, sans-serif`;
         x.textAlign = 'center'; x.textBaseline = 'middle';
         x.fillText(l, a + w / 2, b + h / 2);
@@ -102,7 +129,7 @@ export default function Projects() {
       x.restore();
     };
     const T = (s, a, b, c, al) => {
-      x.fillStyle = c || '#86a094';
+      x.fillStyle = c || MUTED;
       x.font = `500 ${fs * 0.9}px Bricolage Grotesque, sans-serif`;
       x.textAlign = al || 'left'; x.textBaseline = 'middle';
       x.fillText(s, a, b);
@@ -112,7 +139,7 @@ export default function Projects() {
       x.save();
       if (dash) x.setLineDash([5, 5]);
       x.beginPath(); x.moveTo(a, b); x.lineTo(c, d);
-      x.strokeStyle = '#ffffff2a'; x.lineWidth = 1.2; x.stroke();
+      x.strokeStyle = LINE; x.lineWidth = 1.2; x.stroke();
       x.restore();
     };
     const Pt = (pts, u) => {
@@ -214,12 +241,12 @@ export default function Projects() {
         const e2 = [W * 0.46, H * 0.62, W * 0.17, H * 0.17];
         const db = [W * 0.74, H * 0.4, W * 0.17, H * 0.2];
         const nat = [W * 0.2, H * 0.78, W * 0.17, H * 0.12];
-        x.save(); x.setLineDash([6, 6]); x.strokeStyle = '#4df0a055';
+        x.save(); x.setLineDash([6, 6]); x.strokeStyle = BOX;
         x.strokeRect(W * 0.14, H * 0.06, W * 0.82, H * 0.88); x.restore();
         T('VPC', W * 0.15, H * 0.1, G);
         const c = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
         [[[W * 0.04, H * 0.5], c(lb)], [c(lb), c(e1)], [c(lb), c(e2)], [c(e1), c(db)], [c(e2), c(db)]]
-          .forEach((s) => L(s[0][0], s[0][1], s[1][0], s[1][1], true));
+                    .forEach((s) => L(s[0][0], s[0][1], s[1][0], s[1][1], true));
         T('Internet', W * 0.02, H * 0.55);
         B(...lb, 'Load Balancer', 1); B(...e1, 'EC2 · app', 1); B(...e2, 'EC2 · app', 1);
         B(...db, 'RDS', 1); B(...nat, 'NAT Gateway');
@@ -238,11 +265,14 @@ export default function Projects() {
     const loop = () => {
       if (C.clientWidth !== W || C.clientHeight !== H) rs();
       const t = reduce ? 2 : (performance.now() - t0) / 1000;
+      const theme = document.documentElement.dataset.theme || 'dark';
+      if (theme !== lastTheme) { lastTheme = theme; readColors(); }
       x.clearRect(0, 0, W, H);
       try { A[curRef.current](t); } catch (e) { console.error(e); }
       raf = requestAnimationFrame(loop);
     };
     rs();
+    readColors();
     loop();
     return () => cancelAnimationFrame(raf);
   }, []);
